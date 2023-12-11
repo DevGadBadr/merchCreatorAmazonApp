@@ -577,10 +577,10 @@ class MainCode():
                 en=False
                 while not en:
                     try:
-                        heading = driver.find_element(By.XPATH,'//*[@id="address"]/h2')
-                        t=heading.text
-                        if 'Which country/region do you live in?' in t:
-                            en=False
+                        lang_but = driver.find_element(By.XPATH,'//*[@id="angular-page-container"]/div[1]/div[1]/div/div[2]/div/button')
+                        t=lang_but.text
+                        if 'EN' in t:
+                            en=True
                             break
                     except:
                         pass
@@ -684,64 +684,103 @@ class MainCode():
                 tax_but.click()
                 
         except:
+            
+
 
             #check individual
-            indvidual = driver.find_element(By.XPATH,'//*[@id="mat-radio-2"]/label/div[1]')
+            indvidual = driver.find_element(By.XPATH,'//*[@id="mat-radio-2"]/label')
             indvidual.click()
+            
+            #type fullname
+            
+            b3_box = driver.find_element(By.XPATH,'//*[@id="mat-input-1"]')
+            b3_box.send_keys(d[5])
+            
+            #type phone
+            
+            b9_box = driver.find_element(By.XPATH,'//*[@id="mat-input-0"]')
+            b9_box.send_keys(d[11])
+            
+            #type bussiness email address
+            
+            b10_box = driver.find_element(By.XPATH,'//*[@id="mat-input-2"]')
+            b10_box.send_keys(d[12])
+
+
+            #Click on add address button
+            
+            indvidual = driver.find_element(By.XPATH,'//*[@id="super-comp-2"]/div/div[3]/div/button')
+            indvidual.click()
+            
+            while True:
+                try:
+                    #type country or region
+                    
+                    b2_box = driver.find_element(By.XPATH,'//*[@id="mat-input-27"]')
+                    b2_box.send_keys(d[4].capitalize())
+                    
+                    click_country = driver.find_element(By.CLASS_NAME,'mat-option-text')
+                    click_country.click()
+                    
+                    break
+                except:
+                    pass
+            
+            
+            #type Address Line 1
+            
+            b4_box = driver.find_element(By.XPATH,'//*[@id="mat-input-34"]')
+            b4_box.send_keys(d[6])
+            
+            #type Address Line 2
+            
+            b5_box = driver.find_element(By.XPATH,'//*[@id="mat-input-35"]')
+            b5_box.send_keys(d[7])
+            
 
             #type birthday
             
             b1_box = driver.find_element(By.XPATH,'//*[@id="address-dateOfBirth"]')
             b1_box.send_keys(d[3])
-
-            #type country or region
             
-            b2_box = driver.find_element(By.XPATH,'//*[@id="address-country"]')
-            b2_box.send_keys(d[4].capitalize())
-            
-            click_country = driver.find_element(By.CLASS_NAME,'mat-option-text')
-            click_country.click()
-
-            #type fullname
-            
-            b3_box = driver.find_element(By.XPATH,'//*[@id="address-name"]')
-            b3_box.send_keys(d[5])
-
-            #type Address Line 1
-            
-            b4_box = driver.find_element(By.XPATH,'//*[@id="address-line-one"]')
-            b4_box.send_keys(d[6])
-
-            #type Address Line 2
-            
-            b5_box = driver.find_element(By.XPATH,'//*[@id="address-line-two"]')
-            b5_box.send_keys(d[7])
-
             #type city
             
-            b6_box = driver.find_element(By.XPATH,'//*[@id="address-city"]')
+            b6_box = driver.find_element(By.XPATH,'//*[@id="mat-input-36"]')
             b6_box.send_keys(d[8])
 
-            #type state/province/region
-            
-            b7_box = driver.find_element(By.XPATH,'//*[@id="address-state"]')
-            b7_box.send_keys(d[9])
 
+            #type state/province/region
+            b7_box = driver.find_element(By.XPATH,'//*[@id="mat-input-37"]')
+            b7_box.send_keys(d[9])
+            while True:
+                try:
+                    provinza = driver.find_element(By.CLASS_NAME,'mat-option-text')
+                    provinza.click()
+                
+                except:
+                
+                    b5_box = driver.find_element(By.XPATH,'//*[@id="mat-input-35"]')
+                    b5_box.click()
+                    try:
+                        error_msg = driver.find_element(By.XPATH,'//*[@id="mat-dialog-5"]/app-workflow-dialog/app-smooth-height/div/div/div/app-create-edit-address-form/form/mat-dialog-content/mat-form-field[5]/div/div[1]/div/div/span[1]')
+                        err = error_msg.text
+                        if 'State/Province/Region is required' in err:
+                            b7_box = driver.find_element(By.XPATH,'//*[@id="mat-input-37"]')
+                            b7_box.send_keys('')
+                            provinza = driver.find_element(By.CLASS_NAME,'mat-option-text')
+                            provinza.click()
+                            break
+                    except:
+                        break
+                            
+                    
             #type postal code
             
-            b8_box = driver.find_element(By.XPATH,'//*[@id="address-postal-code"]')
+            b8_box = driver.find_element(By.XPATH,'//*[@id="mat-input-38"]')
             b8_box.send_keys(d[10])
-
-            #type phone
             
-            b9_box = driver.find_element(By.XPATH,'//*[@id="address-phone"]')
-            b9_box.send_keys(d[11])
-
-            #type bussiness email address
             
-            b10_box = driver.find_element(By.XPATH,'//*[@id="address-email"]')
-            b10_box.send_keys(d[12])
-
+# *******************************************************************************************************************************************************************************************************
 
             #Add Bank Details
 

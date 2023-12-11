@@ -13,31 +13,31 @@ class worker_1(QThread):
     finished = pyqtSignal(str,str)
     
     def run(self):
-        try:
-            name = main_code.getname(0)
-            main_code.maincodeexcute(0)
-            self.finished.emit(name,'success')
+        # try:
+        name = main_code.getname(0)
+        main_code.maincodeexcute(0)
+        self.finished.emit(name,'success')
             
-        except SystemExit:
-            print('Code Finished Running 1')
-            self.finished.emit(name,'success')
-        except NoSuchWindowException or InvalidSessionIdException or WebDriverException:
-            print('Oops ,Browser Window was closed please try again 1')
+        # except SystemExit:
+        #     print('Code Finished Running 1')
+        #     self.finished.emit(name,'success')
+        # except NoSuchWindowException or InvalidSessionIdException or WebDriverException:
+        #     print('Oops ,Browser Window was closed please try again 1')
             
-        except UnboundLocalError:
-            print('Problem with Browser, Consider Changing the Proxy 1')
+        # except UnboundLocalError:
+        #     print('Problem with Browser, Consider Changing the Proxy 1')
             
-        except ConnectionAbortedError:
-            print('Connection Aborted! Please Try Connecting again after closing Antivirus or firewall 1')
+        # except ConnectionAbortedError:
+        #     print('Connection Aborted! Please Try Connecting again after closing Antivirus or firewall 1')
 
-        except ProtocolError:
-            print('Protocol Error! Please Try Connecting again 1')
+        # except ProtocolError:
+        #     print('Protocol Error! Please Try Connecting again 1')
             
-        except NoSuchElementException:
-            print('Problem with Browser, Please try Again 1')
+        # except NoSuchElementException:
+        #     print('Problem with Browser, Please try Again 1')
             
-        except :
-            print('Open Ads work Program and try again 2')
+        # except :
+        #     print('Open Ads work Program and try again 2')
             
         
                         
