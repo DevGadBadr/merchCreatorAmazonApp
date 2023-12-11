@@ -1,0 +1,282 @@
+from PyQt5 import QtCore, QtGui, QtWidgets 
+from appUI import Ui_amazonaccount
+from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtCore import QThread , pyqtSignal
+from amazon_accounts_Module import MainCode
+from selenium.common.exceptions import NoSuchWindowException,InvalidSessionIdException,WebDriverException,NoSuchElementException
+from urllib3.exceptions import ProtocolError
+import time
+from PyQt5.QtCore import Qt
+
+class worker_1(QThread):
+    
+    finished = pyqtSignal(str,str)
+    
+    def run(self):
+        try:
+            name = main_code.getname(0)
+            main_code.maincodeexcute(0)
+            self.finished.emit(name,'success')
+            
+        except SystemExit:
+            print('Code Finished Running 1')
+            self.finished.emit(name,'success')
+        except NoSuchWindowException or InvalidSessionIdException or WebDriverException:
+            print('Oops ,Browser Window was closed please try again 1')
+            
+        except UnboundLocalError:
+            print('Problem with Browser, Consider Changing the Proxy 1')
+            
+        except ConnectionAbortedError:
+            print('Connection Aborted! Please Try Connecting again after closing Antivirus or firewall 1')
+
+        except ProtocolError:
+            print('Protocol Error! Please Try Connecting again 1')
+            
+        except NoSuchElementException:
+            print('Problem with Browser, Please try Again 1')
+            
+        except :
+            print('Open Ads work Program and try again 2')
+            
+        
+                        
+
+class Worker_2(QThread):
+    
+    finished = pyqtSignal()
+    
+    def run(self):
+        try:
+            time.sleep(2)
+            name = main_code.getname(1)
+            main_code.maincodeexcute(1)
+            self.finished.emit(name,'success')
+        except SystemExit:
+            print('Code Finished Running 2')
+            self.finished.emit(name,'success')
+            
+        except NoSuchWindowException or InvalidSessionIdException or WebDriverException:
+            print('Oops ,Browser Window was closed please try again 2')
+            
+        except UnboundLocalError:
+            print('Problem with Browser, Consider Changing the Proxy 2')
+            
+        except ConnectionAbortedError:
+            print('Connection Aborted! Please Try Connecting again after closing Antivirus or firewall 2')
+
+        except ProtocolError:
+            print('Protocol Error! Please Try Connecting again 2')
+            
+        except NoSuchElementException:
+            print('Problem with Browser, Please try Again 2')
+
+        except :
+            print('Open Ads work Program and try again 2')
+            
+        # self.finished.emit()
+        
+class Worker_3(QThread):
+    
+    finished = pyqtSignal()
+    
+    def run(self):
+        try:
+            time.sleep(4)
+            name = main_code.getname(2)
+            main_code.maincodeexcute(2)
+            self.finished.emit(name,'success')
+        except SystemExit:
+            print('Code Finished Running 3')
+            self.finished.emit(name,'success')
+            
+        except NoSuchWindowException or InvalidSessionIdException or WebDriverException:
+            print('Oops ,Browser Window was closed please try again 3')
+            
+        except UnboundLocalError:
+            print('Problem with Browser, Consider Changing the Proxy 3')
+            
+        except ConnectionAbortedError:
+            print('Connection Aborted! Please Try Connecting again after closing Antivirus or firewall 3')
+
+        except ProtocolError:
+            print('Protocol Error! Please Try Connecting again 3')
+            
+        except NoSuchElementException:
+            print('Problem with Browser, Please try Again 3')
+
+        except :
+            print('Open Ads work Program and try again 3')
+            
+        # self.finished.emit()
+
+class Worker_4(QThread):
+    
+    finished = pyqtSignal()
+    
+    def run(self):
+        try:
+            time.sleep(6)
+            name = main_code.getname(3)
+            main_code.maincodeexcute(3)
+            self.finished.emit(name,'success')
+        except SystemExit:
+            print('Code Finished Running 4')
+            self.finished.emit(name,'success')
+            
+        except NoSuchWindowException or InvalidSessionIdException or WebDriverException:
+            print('Oops ,Browser Window was closed please try again 4')
+            
+        except UnboundLocalError:
+            print('Problem with Browser, Consider Changing the Proxy 4')
+            
+        except ConnectionAbortedError:
+            print('Connection Aborted! Please Try Connecting again after closing Antivirus or firewall 4')
+
+        except ProtocolError:
+            print('Protocol Error! Please Try Connecting again 4')
+            
+        except NoSuchElementException:
+            print('Problem with Browser, Please try Again 4')
+
+        except :
+            print('Open Ads work Program and try again 4')
+            
+        # self.finished.emit()
+            
+class Worker_5(QThread):
+    
+    finished = pyqtSignal()
+    
+    def run(self):
+        try:
+            time.sleep(8)
+            name = main_code.getname(4)
+            main_code.maincodeexcute(4)
+            self.finished.emit(name,'success')
+        except SystemExit:
+            print('Code Finished Running 5')
+            self.finished.emit(name,'success')
+            
+        except NoSuchWindowException or InvalidSessionIdException or WebDriverException:
+            print('Oops ,Browser Window was closed please try again 5')
+            
+        except UnboundLocalError:
+            print('Problem with Browser, Consider Changing the Proxy 5')
+            
+        except ConnectionAbortedError:
+            print('Connection Aborted! Please Try Connecting again after closing Antivirus or firewall 5')
+
+        except ProtocolError:
+            print('Protocol Error! Please Try Connecting again 5')
+            
+        except NoSuchElementException:
+            print('Problem with Browser, Please try Again 5')
+
+        except :
+            print('Open Ads work Program and try again 5')
+            
+        # self.finished.emit()
+
+class AppUI(Ui_amazonaccount):
+    
+    def myui(self,appwindow):
+        super().setupUi(appwindow)
+        # with open('style.css','r') as sh:
+        #     appwindow.setStyleSheet(sh.read())
+        self.myedit()
+        self.counter = 0
+        
+    def myedit(self):
+
+        appwindow.setFixedSize(855,404)
+        appwindow.setWindowIcon(QtGui.QIcon('icon.png'))
+        appwindow.setWindowFlags(appwindow.windowFlags() | Qt.WindowMinimizeButtonHint)
+        self.start_button.clicked.connect(self.maincode)
+        self.browse_button.clicked.connect(self.open_data)
+        self.close_button.clicked.connect(self.close_window)
+        self.profiles_button.clicked.connect(self.profiles)
+        self.openLogbut.clicked.connect(self.openLog)
+
+    def openLog(self):
+        QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile('Logging.txt'))
+        
+    def read_profiles(self):
+        with open('profile_ids.txt','r') as h :
+            ids = h.readlines()
+        h.close()
+        
+        #cleaning
+        clean_ids=[]
+        for i in ids:
+            l=i.replace('\n','')
+            clean_ids.append(l)
+                   
+    def maincode(self):
+       
+        self.worker_1 = worker_1()
+        self.worker_2 = Worker_2()
+        self.worker_3 = Worker_3()
+        self.worker_4 = Worker_4()
+        self.worker_5 = Worker_5()
+        
+        self.worker_1.finished.connect(self.codefinish)
+        self.worker_2.finished.connect(self.codefinish)
+        self.worker_3.finished.connect(self.codefinish)
+        self.worker_4.finished.connect(self.codefinish)
+        self.worker_5.finished.connect(self.codefinish)
+
+        start_list=[
+            self.worker_1,
+            self.worker_2,
+            self.worker_3,
+            self.worker_4,
+            self.worker_5
+        ]
+        
+        with open('profile_ids.txt','r') as p:
+            m = p.readlines()
+            print(m)
+            cleanm=[]
+            for item in m:
+                nitem = item.replace('\n','')
+                if len(nitem)==7:
+                    cleanm.append(nitem)
+                else:
+                    pass
+        p.close()
+        print(cleanm)
+        
+        for pro in range(0,len(cleanm)):
+            start_list[pro].start()
+                      
+        
+    def open_data(self):
+        QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile('account_details.txt'))
+        
+    def close_window(self):
+        app.closeAllWindows()    
+        
+    def progress_bar(self):
+        pass
+    
+    def codefinish(self,name,status):
+        
+        if status == 'success':
+            self.msg = QtWidgets.QMessageBox()
+            self.msg.setText(f'Merch Account Created Successfully for\n{name}')
+            self.msg.setWindowIcon(QtGui.QIcon('icon.png'))
+            self.msg.setWindowTitle('Success')
+            self.msg.exec()
+        
+    def profiles(self):
+        QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile('profile_ids.txt'))
+        
+if __name__ == '__main__':
+    main_code = MainCode()
+    app =QtWidgets.QApplication([])
+    appwindow = QtWidgets.QDialog()
+    mydialog = AppUI()
+    mydialog.myui(appwindow)
+    appwindow.show()
+    app.exec_()
