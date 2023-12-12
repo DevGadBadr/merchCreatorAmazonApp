@@ -54,7 +54,7 @@ class Worker_2(QThread):
             self.finished.emit(name,'success')
         except SystemExit:
             print('Code Finished Running 2')
-            self.finished.emit(name,'success')
+            # self.finished.emit(name,'success')
             
         except NoSuchWindowException or InvalidSessionIdException or WebDriverException:
             print('Oops ,Browser Window was closed please try again 2')
@@ -88,7 +88,7 @@ class Worker_3(QThread):
             self.finished.emit(name,'success')
         except SystemExit:
             print('Code Finished Running 3')
-            self.finished.emit(name,'success')
+            # self.finished.emit(name,'success')
             
         except NoSuchWindowException or InvalidSessionIdException or WebDriverException:
             print('Oops ,Browser Window was closed please try again 3')
@@ -122,7 +122,7 @@ class Worker_4(QThread):
             self.finished.emit(name,'success')
         except SystemExit:
             print('Code Finished Running 4')
-            self.finished.emit(name,'success')
+            # self.finished.emit(name,'success')
             
         except NoSuchWindowException or InvalidSessionIdException or WebDriverException:
             print('Oops ,Browser Window was closed please try again 4')
@@ -156,7 +156,7 @@ class Worker_5(QThread):
             self.finished.emit(name,'success')
         except SystemExit:
             print('Code Finished Running 5')
-            self.finished.emit(name,'success')
+            # self.finished.emit(name,'success')
             
         except NoSuchWindowException or InvalidSessionIdException or WebDriverException:
             print('Oops ,Browser Window was closed please try again 5')
