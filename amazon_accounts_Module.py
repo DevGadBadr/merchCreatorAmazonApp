@@ -40,11 +40,14 @@ class MainCode():
           
         
 
+            
         print('...\nRunning main code')
 
         ex=0
         # user_number = 0
         # profile_id = 0
+        # idd = 0
+
 
         x = Mydata()
         y=x.getdata()
@@ -519,7 +522,7 @@ class MainCode():
         else:
             pass
             
-        
+
         #Case it asked again for OTP
         try:
             #case two step verification
@@ -560,7 +563,7 @@ class MainCode():
         english = False
         while not english:
             try:   
-                heading = driver.find_element(By.XPATH,'//*[@id="address"]/h2')
+                heading = driver.find_element(By.XPATH,'//*[@id="address"]/app-profile-edit/h2')
                 t = heading.text
                 if ('country/region' in t) or ('Creator Information' in t):
                     english=True
@@ -708,7 +711,6 @@ class MainCode():
 
 
             #Click on add address button
-            
             indvidual = driver.find_element(By.XPATH,'//*[@id="super-comp-2"]/div/div[3]/div/button')
             indvidual.click()
             
@@ -716,70 +718,88 @@ class MainCode():
                 try:
                     #type country or region
                     
-                    b2_box = driver.find_element(By.XPATH,'//*[@id="mat-input-27"]')
+                    b2_box = driver.find_element(By.XPATH,'//*[@id="mat-input-3"]')
                     b2_box.send_keys(d[4].capitalize())
-                    
+                    time.sleep(1)
                     click_country = driver.find_element(By.CLASS_NAME,'mat-option-text')
                     click_country.click()
                     
                     break
-                except:
-                    pass
-            
-            
+                except Exception as e:
+                    print(e)
+                    break
+                
             #type Address Line 1
             
-            b4_box = driver.find_element(By.XPATH,'//*[@id="mat-input-34"]')
+            b4_box = driver.find_element(By.XPATH,'//*[@id="mat-input-4"]')
             b4_box.send_keys(d[6])
             
             #type Address Line 2
             
-            b5_box = driver.find_element(By.XPATH,'//*[@id="mat-input-35"]')
+            b5_box = driver.find_element(By.XPATH,'//*[@id="mat-input-5"]')
             b5_box.send_keys(d[7])
             
-
-            #type birthday
-            
-            b1_box = driver.find_element(By.XPATH,'//*[@id="address-dateOfBirth"]')
-            b1_box.send_keys(d[3])
             
             #type city
             
-            b6_box = driver.find_element(By.XPATH,'//*[@id="mat-input-36"]')
+            b6_box = driver.find_element(By.XPATH,'//*[@id="mat-input-6"]')
             b6_box.send_keys(d[8])
 
 
             #type state/province/region
-            b7_box = driver.find_element(By.XPATH,'//*[@id="mat-input-37"]')
+            b7_box = driver.find_element(By.XPATH,'//*[@id="mat-input-7"]')
+            b7_box.click()
+            time.sleep(1)
             b7_box.send_keys(d[9])
+            time.sleep(1)
             while True:
                 try:
                     provinza = driver.find_element(By.CLASS_NAME,'mat-option-text')
                     provinza.click()
+                    break
                 
                 except:
-                
-                    b5_box = driver.find_element(By.XPATH,'//*[@id="mat-input-35"]')
-                    b5_box.click()
+                    
+                    
+                    b07_box = driver.find_element(By.XPATH,'//*[@id="mat-input-8"]')
+                    b07_box.click()
+                    
                     try:
-                        error_msg = driver.find_element(By.XPATH,'//*[@id="mat-dialog-5"]/app-workflow-dialog/app-smooth-height/div/div/div/app-create-edit-address-form/form/mat-dialog-content/mat-form-field[5]/div/div[1]/div/div/span[1]')
+                        error_msg = driver.find_element(By.XPATH,'//*[@id="mat-dialog-0"]/app-workflow-dialog/app-smooth-height/div/div/div/app-create-edit-address-form/form/mat-dialog-content/mat-form-field[5]/div/div[1]/div/div/span[1]')
                         err = error_msg.text
                         if 'State/Province/Region is required' in err:
-                            b7_box = driver.find_element(By.XPATH,'//*[@id="mat-input-37"]')
-                            b7_box.send_keys('')
+                            print('error detected')
+                            time.sleep(2)
+                            b7_box = driver.find_element(By.XPATH,'//*[@id="mat-input-7"]')
+                            b7_box.clear()
+                            b07_box = driver.find_element(By.XPATH,'//*[@id="mat-input-7"]')
+                            b07_box.click()
+                            time.sleep(1)
                             provinza = driver.find_element(By.CLASS_NAME,'mat-option-text')
                             provinza.click()
-                            break
+                        break
                     except:
                         break
                             
                     
-            #type postal code
+            # type postal code
             
-            b8_box = driver.find_element(By.XPATH,'//*[@id="mat-input-38"]')
+            b8_box = driver.find_element(By.XPATH,'//*[@id="mat-input-8"]')
             b8_box.send_keys(d[10])
             
+            # Press Use this address
             
+            use_But = driver.find_element(By.XPATH,'//*[@id="mat-dialog-0"]/app-workflow-dialog/app-smooth-height/div/div/div/app-create-edit-address-form/form/mat-dialog-actions/button')
+            use_But.click()
+            time.sleep(1)
+            while True:
+                try:
+                    driver.find_element(By.XPATH,'//*[@id="interview-bank-country"]')
+                    break
+                except:
+                    time.sleep(3)
+                    print('Wrong Data please edit it to continue')
+                    
             #Add Bank Details
 
             #Type bank location
@@ -798,16 +818,51 @@ class MainCode():
             
             b13_box = driver.find_element(By.XPATH,'//*[@id="interview-bank-iban"]')
             b13_box.send_keys(d[15])
+            
+            #Type Date of birth
+            b013_box = driver.find_element(By.XPATH,'//*[@id="mat-input-13"]')
+            b013_box.send_keys(d[3])
+            
+            # Select current address
+            b013_box = driver.find_element(By.XPATH,'//*[@id="super-comp-10"]/div/div[3]/div[1]/button')
+            b013_box.click()
+            time.sleep(1)
+            b013_box = driver.find_element(By.XPATH,'//*[@id="mat-radio-11"]/label/div[2]/app-html-string/span')
+            b013_box.click()
+            time.sleep(1)
+            while True:
+                try:
+                    b26_box = driver.find_element(By.XPATH,'//*[@id="mat-dialog-1"]/app-workflow-dialog/app-smooth-height/div/div/div/app-custom-address-sources/form/mat-dialog-actions/button[1]')
+                    b26_box.click()
+                    break
+                except:
+                    time.sleep(1)
+                    print('press use this current address')
+                    pass
 
+            time.sleep(1)
+            #Case address not accurate
+            try:
+                b013_box = driver.find_element(By.XPATH,'//*[@id="mat-checkbox-4"]/label/span')
+                b013_box.click()
+                time.sleep(1)
+                b013_box = driver.find_element(By.XPATH,'//*[@id="mat-dialog-3"]/app-workflow-dialog/app-smooth-height/div/div/div/app-suggestions/form/mat-dialog-actions/button[1]')
+                b013_box.click()
+            except:
+                pass
+            
+                
 
             #Type BIC Code
             
             b14_box = driver.find_element(By.XPATH,'//*[@id="interview-bank-bic"]')
             b14_box.send_keys(d[16])
+            
+            
 
             #Click Add Bank Button
             time.sleep(1)
-            add_but = driver.find_element(By.XPATH,'//*[@id="interview-save-button"]')
+            add_but = driver.find_element(By.XPATH,'//*[@id="super-comp-3"]/app-bank-account-form/div/form/div[3]/div/div[1]/button')
             add_but.click()
 
             time.sleep(5)
@@ -853,9 +908,9 @@ class MainCode():
         agent_but.click()
 
         #choose country
-        c = driver.find_element(By.XPATH,'//*[@id="a-autoid-13-announce"]')
+        c = driver.find_element(By.XPATH,'//*[@id="a-autoid-12-announce"]')
         c.click()
-        dropdown = driver.find_element(By.XPATH,'//*[@id="a-popover-18"]/div/div')
+        dropdown = driver.find_element(By.CLASS_NAME,'a-popover-inner')
         country = dropdown.find_element(By.LINK_TEXT,d[4].capitalize())
         country.click()
 
@@ -871,29 +926,39 @@ class MainCode():
 
         #click continue
         time.sleep(1)
-        cont = driver.find_element(By.XPATH,'//*[@id="a-autoid-23-announce"]')
+        cont = driver.find_element(By.XPATH,'//*[@id="a-autoid-22-announce"]')
+        cont.click()
+
+
+        #click save and preview
+
+        time.sleep(1)
+        cont = driver.find_element(By.XPATH,'//*[@id="a-autoid-86-announce"]')
         cont.click()
 
         #signature
-        time.sleep(1)
-        check_sign = driver.find_element(By.XPATH,'//*[@id="checkBoxDiv_SignatureCapacityForIndividualW8Ben"]/span/div/label/span/span')
-        check_sign.click()
-        signature_name = driver.find_element(By.XPATH,'//*[@id="textBoxSingleDiv_ElectronicSignatureW8BenName"]/input')
-        signature_name.send_keys(d[5])
-
-
+        while True:
+            try:
+                time.sleep(1)
+                check_sign = driver.find_element(By.XPATH,'//*[@id="checkBoxDiv_SignatureCapacityForIndividualW8Ben"]/span/div/label/i')
+                check_sign.click()
+                signature_name = driver.find_element(By.XPATH,'//*[@id="textBoxSingleDiv_ElectronicSignatureW8BenName"]/input')
+                signature_name.send_keys(d[5])
+                break
+            except:
+                pass
 
         try:
             #Try to click address valid if it's shown
             address_Valid = driver.find_element(By.XPATH,'//*[@id="checkBoxDiv_NonUSPermAddressOverride"]/span/div/label/span/span')
             address_Valid.click()
         except:
-            print('Click the Address is Valid to Continue')
+            print('Valid Address')
 
 
         try:
-            #Click Save and preview
-            save_preview = driver.find_element(By.XPATH,'//*[@id="a-autoid-95-announce"]')
+            #Click Submit form
+            save_preview = driver.find_element(By.XPATH,'//*[@id="button_SubmitButton"]/span/span/span/button')
             save_preview.click()
         except:
             print('Something is wrong with the information review it and try again')
@@ -905,36 +970,46 @@ class MainCode():
             
             #click continue
             time.sleep(1)
-            cont = driver.find_element(By.XPATH,'//*[@id="a-autoid-23-announce"]')
+            cont = driver.find_element(By.XPATH,'//*[@id="a-autoid-22-announce"]')
+            cont.click()
+            
+            #click save and preview
+
+            time.sleep(1)
+            cont = driver.find_element(By.XPATH,'//*[@id="a-autoid-86-announce"]')
             cont.click()
             
             #signature
-            time.sleep(1)
-            check_sign = driver.find_element(By.XPATH,'//*[@id="checkBoxDiv_SignatureCapacityForIndividualW8Ben"]/span/div/label/span/span')
-            check_sign.click()
-            signature_name = driver.find_element(By.XPATH,'//*[@id="textBoxSingleDiv_ElectronicSignatureW8BenName"]/input')
-            signature_name.send_keys(d[5])
+            while True:
+                try:
+                    time.sleep(1)
+                    check_sign = driver.find_element(By.XPATH,'//*[@id="checkBoxDiv_SignatureCapacityForIndividualW8Ben"]/span/div/label/i')
+                    check_sign.click()
+                    signature_name = driver.find_element(By.XPATH,'//*[@id="textBoxSingleDiv_ElectronicSignatureW8BenName"]/input')
+                    signature_name.send_keys(d[5])
+                    break
+                except:
+                    pass
 
         except:
-            print('Click the Address is Valid to Continue')
+            print('Valid Address Passed')
 
 
-        submit_form_clicked=False
-        while not submit_form_clicked:
-            try:
-                time.sleep(4)
-                wait = WebDriverWait(driver, 120)
-                wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
+        # submit_form_clicked=False
+        # while not submit_form_clicked:
+        #     try:
+        #         time.sleep(4)
+        #         wait = WebDriverWait(driver, 120)
+        #         wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
 
-                #Click submit form
-                wait13 = WebDriverWait(driver,30).until(EC.element_to_be_clickable((By.XPATH,'//*[@id="button_SubmitButton"]/span/span/span/button')))
-                sub_form = driver.find_element(By.XPATH,'//*[@id="button_SubmitButton"]/span/span/span/button')
-                sub_form.click()
-                submit_form_clicked=True
-                break
-            except:
-                pass
-
+        #         #Click submit form
+        #         wait13 = WebDriverWait(driver,30).until(EC.element_to_be_clickable((By.XPATH,'//*[@id="button_SubmitButton"]/span/span/span/button')))
+        #         sub_form = driver.find_element(By.XPATH,'//*[@id="button_SubmitButton"]/span/span/span/button')
+        #         sub_form.click()
+        #         submit_form_clicked=True
+        #         break
+        #     except:
+        #         pass
 
         exit_preview_clicked = False
         while not exit_preview_clicked:
@@ -993,7 +1068,7 @@ class MainCode():
         paragraph.send_keys(d[17])
 
         print(True, '\nMerch Account Created Successfully')
-        self.logTheResult(idd)
+
 
         '''''
         This 
@@ -1003,7 +1078,3 @@ class MainCode():
         Deveolper and 
         Engineer
         '''''
-
-
-
-        # //*[@id="checkBoxDiv_NonUSPermAddressOverride"]/span/div/label/input
