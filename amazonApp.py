@@ -36,6 +36,9 @@ class worker_1(QThread):
         except NoSuchElementException:
             print('Problem with Browser, Please try Again 1')
             
+        except WebDriverException:
+            print('Please check the version of SunPower Browser in Ads Power')
+            
         except :
             print('Open Ads work Program and try again 2')
             
@@ -197,7 +200,7 @@ class AppUI(Ui_amazonaccount):
         self.close_button.clicked.connect(self.close_window)
         self.profiles_button.clicked.connect(self.profiles)
         self.openLogbut.clicked.connect(self.openLog)
-
+        self.start_button.setCursor(Qt.PointingHandCursor)
     def openLog(self):
         QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile('Logging.txt'))
         

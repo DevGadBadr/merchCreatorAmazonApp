@@ -96,6 +96,7 @@ class MainCode():
         except WebDriverException:
             
             print('Internet Problem')
+            ex=1
             
         except UnboundLocalError:
             print('AdsPower failed to launch, Please try again')
@@ -108,41 +109,32 @@ class MainCode():
         wait = WebDriverWait(driver, 120)
         wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
 
-        #check if there is a captcha or not
-        try:
-            driver.find_element(By.XPATH,'//*[@id="nav-cart-count-container"]/span[2]')
+        #check if there is a captcha or not - wait until i see the search bar
+        counter=1
+        while True:
             
-        except UnboundLocalError:
-            print('AdsPower Failed to launch,\nPlease make sure it opens correctly\nand Try again')
-            
-        except:
+            try:
+                driver.find_element(By.XPATH,'//*[@id="twotabsearchtextbox"]')
+                print('Website Loaded Successfully')
+                break
+                # //*[@id="twotabsearchtextbox"]
+                # /html/body/div/div[1]/div[3]/div/div/form/div[1]/div/div/div[2]/div/div[2]/a
+        
+            except UnboundLocalError:
+                print('AdsPower Failed to launch,\nPlease make sure it opens correctly\nand Try again')
+                break
                 
-            nocaptcha = True
-            n=0
-            while nocaptcha:
-                n=n+1
-                # Open a new tab
-                driver.execute_script("window.open('');")
+            except:
+                counter+=1
+                time.sleep(5)
+                print(f'Captcha Detected Please pass me to continue Trial {counter}, will abort on trial 60')
+                if counter==60:
+                    ex=1
+                    break
+                
+        if ex == 1:
+            raise SystemExit('The Main Code has Finished his task')
 
-                # Switch to the new tab
-                driver.switch_to.window(driver.window_handles[-1])
-
-                #Navigate to another web page in the new tab
-                driver.get('https://www.amazon.com/')
-                
-                try:
-                    sign_in_av = driver.find_element(By.XPATH,'//*[@id="nav-link-accountList-nav-line-1"]')
-                    availabl = sign_in_av.text
-                    
-                except:
-                    pass
-                
-                try:
-                    if 'Hello, sign in' in availabl:
-                        nocaptcha=False   
-                except:
-                    pass
-            
         wait = WebDriverWait(driver, 120)
         wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
 
@@ -791,14 +783,26 @@ class MainCode():
             
             use_But = driver.find_element(By.XPATH,'//*[@id="mat-dialog-0"]/app-workflow-dialog/app-smooth-height/div/div/div/app-create-edit-address-form/form/mat-dialog-actions/button')
             use_But.click()
-            time.sleep(1)
+            time.sleep(2)
+                
+
             while True:
                 try:
                     driver.find_element(By.XPATH,'//*[@id="interview-bank-country"]')
                     break
                 except:
-                    time.sleep(3)
-                    print('Wrong Data please edit it to continue')
+                    time.sleep(1)
+                    try:
+                        use_But = driver.find_element(By.XPATH,'//*[@id="mat-checkbox-2"]/label/span')
+                        use_But.click()
+                        time.sleep(1)
+                        use_But = driver.find_element(By.XPATH,'//*[@id="mat-dialog-1"]/app-workflow-dialog/app-smooth-height/div/div/div/app-suggestions/form/mat-dialog-actions/button[1]')
+                        use_But.click()
+                        print('Address Confirmed')
+                    except:
+                        time.sleep(3)
+                        print('Wrong Data please review to continue')
+                
                     
             #Add Bank Details
 
@@ -824,46 +828,87 @@ class MainCode():
             b013_box.send_keys(d[3])
             
             # Select current address
-            b013_box = driver.find_element(By.XPATH,'//*[@id="super-comp-10"]/div/div[3]/div[1]/button')
-            b013_box.click()
-            time.sleep(1)
-            b013_box = driver.find_element(By.XPATH,'//*[@id="mat-radio-11"]/label/div[2]/app-html-string/span')
-            b013_box.click()
-            time.sleep(1)
             while True:
                 try:
-                    b26_box = driver.find_element(By.XPATH,'//*[@id="mat-dialog-1"]/app-workflow-dialog/app-smooth-height/div/div/div/app-custom-address-sources/form/mat-dialog-actions/button[1]')
-                    b26_box.click()
+                    but1 = driver.find_element(By.XPATH,'//*[@id="super-comp-10"]/div/div[3]/div[1]/button')
+                    but2 = driver.find_element(By.XPATH,'//*[@id="super-comp-10"]/div/div[3]/div[2]/button')
+                    if 'Select Existing Address' in but1.text:
+                        req_but = but1
+                    else:
+                        req_but = but2
                     break
                 except:
                     time.sleep(1)
-                    print('press use this current address')
-                    pass
+            
+            req_but.click()
+            time.sleep(1)
+            # //*[@id="mat-radio-13"]/label/div[2]/app-html-string/span
+            # //*[@id="mat-dialog-2"]/app-workflow-dialog/app-smooth-height/div/div/div/app-custom-address-sources/form/mat-dialog-actions/button[1]
+            # //*[@id="super-comp-10"]/div/div[3]/div[1]/button
+            # //*[@id="mat-radio-11"]/label/div[2]/app-html-string/span
+            # //*[@id="mat-dialog-1"]/app-workflow-dialog/app-smooth-height/div/div/div/app-custom-address-sources/form/mat-dialog-actions/button[1]
+            b013_box = driver.find_element(By.XPATH,'//*[@id="mat-radio-11"]/label/div[2]/app-html-string/span')
+            b013_box.click()
+            time.sleep(1)
+            n=0
+            accurate_will_show=False
+            while True:
+                n+=1
+                xpath = f'//*[@id="mat-dialog-{n}"]/app-workflow-dialog/app-smooth-height/div/div/div/app-custom-address-sources/form/mat-dialog-actions/button[1]'
+                try:
+
+                    b26_box = driver.find_element(By.XPATH,xpath)
+                    b26_box.click()
+                    if n>1:
+                        accurate_will_show=True
+                    break
+                except Exception as e:
+                    time.sleep(1)
+                    print('pressing use this current address')
+                    print(e)
+                    
 
             time.sleep(1)
             #Case address not accurate
-            try:
-                b013_box = driver.find_element(By.XPATH,'//*[@id="mat-checkbox-4"]/label/span')
-                b013_box.click()
-                time.sleep(1)
-                b013_box = driver.find_element(By.XPATH,'//*[@id="mat-dialog-3"]/app-workflow-dialog/app-smooth-height/div/div/div/app-suggestions/form/mat-dialog-actions/button[1]')
-                b013_box.click()
-            except:
-                pass
-            
-                
-
+            if accurate_will_show:
+                while True:
+                    try:
+                        b013_box = driver.find_element(By.XPATH,'//*[@id="mat-checkbox-4"]/label/span')
+                        b013_box.click()
+                        time.sleep(1)
+                        while True:
+                            try:
+                                b013_box = driver.find_element(By.XPATH,'//*[@id="mat-dialog-3"]/app-workflow-dialog/app-smooth-height/div/div/div/app-suggestions/form/mat-dialog-actions/button[1]')
+                                b013_box.click()
+                                break
+                            except:
+                                time.sleep(1)
+                        break
+                    except:
+                        time.sleep(1)
+        
+        
             #Type BIC Code
+            while True:
+                try:
+                    b14_box = driver.find_element(By.XPATH,'//*[@id="interview-bank-bic"]')
+                    b14_box.send_keys(d[16])
+                    break
+                except:
+                    time.sleep(2)
+                    print('Trying to Type BIC code')
             
-            b14_box = driver.find_element(By.XPATH,'//*[@id="interview-bank-bic"]')
-            b14_box.send_keys(d[16])
             
             
-
             #Click Add Bank Button
-            time.sleep(1)
-            add_but = driver.find_element(By.XPATH,'//*[@id="super-comp-3"]/app-bank-account-form/div/form/div[3]/div/div[1]/button')
-            add_but.click()
+            while True:
+                try:
+                    time.sleep(1)
+                    add_but = driver.find_element(By.XPATH,'//*[@id="super-comp-3"]/app-bank-account-form/div/form/div[3]/div/div[1]/button')
+                    add_but.click()
+                    break
+                except:
+                    time.sleep(1)
 
             time.sleep(5)
             
@@ -935,6 +980,42 @@ class MainCode():
         time.sleep(1)
         cont = driver.find_element(By.XPATH,'//*[@id="a-autoid-86-announce"]')
         cont.click()
+        
+        while True:
+            try:
+                check_sign = driver.find_element(By.XPATH,'//*[@id="checkBoxDiv_SignatureCapacityForIndividualW8Ben"]/span/div/label/i')
+                valid_address_passed = True
+                print('Valid Address')
+                break
+                
+            except:
+                try:
+                    address_Valid = driver.find_element(By.XPATH,'//*[@id="checkBoxDiv_NonUSPermAddressOverride"]/span/div/label/span/span')
+                    valid_address_passed = False
+                    break
+                except:
+                    time.sleep(2)
+                    print('Waiting Page')        
+        
+        if not valid_address_passed:
+            try:
+                #Try to click address valid if it's shown
+                address_Valid = driver.find_element(By.XPATH,'//*[@id="checkBoxDiv_NonUSPermAddressOverride"]/span/div/label/span/span')
+                address_Valid.click()
+                time.sleep(1)
+                address_Valid = driver.find_element(By.XPATH,'//*[@id="button_NonUSTaxIdentityInformationSectionSaveButton"]/span/span/span/button')
+                address_Valid.click()
+                time.sleep(1)
+                while True:
+                    try:
+                        cont = driver.find_element(By.XPATH,'//*[@id="button_SaveAndPreviewButtonW8Ben"]/span/span/span/button')
+                        cont.click()
+                        break
+                    except:
+                        time.sleep(1)
+                        
+            except:
+                print('Valid Address')
 
         #signature
         while True:
@@ -948,12 +1029,7 @@ class MainCode():
             except:
                 pass
 
-        try:
-            #Try to click address valid if it's shown
-            address_Valid = driver.find_element(By.XPATH,'//*[@id="checkBoxDiv_NonUSPermAddressOverride"]/span/div/label/span/span')
-            address_Valid.click()
-        except:
-            print('Valid Address')
+
 
 
         try:
