@@ -17,8 +17,11 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 import datetime
+from PyQt5.QtCore import *
 
-class MainCode():
+class MainCode(QObject):
+    
+    status_message = pyqtSignal(str)
     
     def getname(self,idd):
         
@@ -37,12 +40,9 @@ class MainCode():
         l.close()
 
     def maincodeexcute(self,idd):
-          
         
-
-            
         print('...\nRunning main code')
-
+                
         ex=0
         # user_number = 0
         # profile_id = 0
@@ -86,8 +86,8 @@ class MainCode():
         chrome_options.add_experimental_option("debuggerAddress", resp["data"]["ws"]["selenium"])
         driver = webdriver.Chrome(service=myservice, options=chrome_options)
 
-        print('Code Running...')
-
+        msg = 'Code Running...'
+        print(msg)
 
         try :
 
@@ -112,6 +112,13 @@ class MainCode():
         #check if there is a captcha or not - wait until i see the search bar
         counter=1
         while True:
+            try:
+                #IF odd amazon home page it loads the website again
+                driver.find_element(By.XPATH,'//*[@id="navbar-backup-backup"]/div/div[3]/a[1]')
+                driver.get(url)
+                
+            except:
+                time.sleep(1)
             
             try:
                 driver.find_element(By.XPATH,'//*[@id="twotabsearchtextbox"]')
@@ -128,6 +135,12 @@ class MainCode():
                 counter+=1
                 time.sleep(5)
                 print(f'Captcha Detected Please pass me to continue Trial {counter}, will abort on trial 60')
+                
+                try:
+                    driver.current_url
+                except:
+                    break
+
                 if counter==60:
                     ex=1
                     break
@@ -159,15 +172,25 @@ class MainCode():
             
         wait = WebDriverWait(driver, 120)
         wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
-
-
+        
         waittoload = WebDriverWait(driver,200).until(EC.element_to_be_clickable((By.XPATH,'//*[@id="nav-link-accountList-nav-line-1"]')))
-        name = driver.find_element(By.XPATH,'//*[@id="nav-link-accountList-nav-line-1"]')
-        user=name.text
-        signed_in=False
-
+      
+        while True:
+            try:
+                name = driver.find_element(By.XPATH,'//*[@id="nav-link-accountList-nav-line-1"]')
+                user=name.text
+                signed_in=False
+                break
+            except:
+      
+                time.sleep(2)
+                try:
+                    driver.current_url
+                except:
+                    break
+                
         #check if already signed in     
-        if user == 'Hello, sign in':
+        if 'Hello, sign in' in user:
                 
             #step 1 sign in to amazon account
             wait2 = WebDriverWait(driver,30).until(EC.element_to_be_clickable((By.XPATH,'//*[@id="nav-link-accountList"]')))
@@ -233,85 +256,151 @@ class MainCode():
                     check_box = driver.find_element(By.XPATH,'//*[@id="signInSubmit"]')
                     check_box.click()
                     
-                    #Handle Important message
-                    try:
-                        #Type Password
-                        otp_box = driver.find_element(By.XPATH,'//*[@id="ap_password"]')
-                        otp_box.send_keys(password)
-                        
-                        print('Hello, Please Enter Captcha and then Type any key in the box and hit Enter')
-                        x= input('Enter any key and Hit Enter')
-                        
-                        #click sign in
-                        siggi = driver.find_element(By.XPATH,'//*[@id="signInSubmit"]')
-                        siggi.click()
-                        
-                        try:
-                            siggi = driver.find_element(By.XPATH,' //*[@id="auth-error-message-box"]/div/h4')
-                            #Type Password
-                            otp_box = driver.find_element(By.XPATH,'//*[@id="ap_password"]')
-                            otp_box.send_keys(password)
-                            #click sign in
-                            siggi = driver.find_element(By.XPATH,'//*[@id="signInSubmit"]')
-                            siggi.click()
-                        except:
-                            pass
-                        
-                    except:
-                        pass
-                        
-                    #check if already signed in or need to enter otp
                     
-                    try:
-                        sign_in_check = driver.find_element(By.XPATH,'//*[@id="nav-cart-count-container"]/span[2]')
-                    except:
+                    # #Handle Important message
+                    # try:
+                    #     #Type Password
+                    #     otp_box = driver.find_element(By.XPATH,'//*[@id="ap_password"]')
+                    #     otp_box.send_keys(password)
                         
-                        # Create a new TOTP object
-                        totp = pyotp.TOTP(secret)
+                    #     print('Hello, Please Enter Captcha and then Type any key in the box and hit Enter')
+                    #     while True:
+                    #         try:
+                    #             siggi = driver.find_element(By.XPATH,'//*[@id="signInSubmit"]')
+                    #             break
 
-                        # Generate a new OTP
-                        otp = totp.now()
-                        
-                        #paste otp and click sign in
-                        otp_box = driver.find_element(By.XPATH,'//*[@id="auth-mfa-otpcode"]')
-                        otp_box.send_keys(otp)
-                    
-                        #checkbox for remember me
-                        ch_otp = driver.find_element(By.XPATH,'//*[@id="auth-mfa-remember-device"]')
-                        ch_otp.click()
-                        
-                        #click sign in for otp
-                        sign_in_otp = driver.find_element(By.XPATH,'//*[@id="auth-signin-button"]')
-                        sign_in_otp.click()
-                        
-                        time.sleep(2)
-                        
-                        # Case if the OTP is incorrect
-                        try:
-                            sign_in_otp = driver.find_element(By.XPATH,'//*[@id="auth-signin-button"]')
-                            passed=False
-                            while not passed:
+                    #         except:
+                    #             time.sleep(2)
                                 
-                                try:
-                                    driver.find_element(By.XPATH,'//*[@id="nav-link-accountList"]')
-                                    passed=True
-                                    break
-                                except:
-                                    pass
-                        except:
-                            pass
-
-                        #skip hackers-out check
+                    #     #click sign in
+                    #     siggi = driver.find_element(By.XPATH,'//*[@id="signInSubmit"]')
+                    #     siggi.click()
+                        
+                    #     try:
+                    #         siggi = driver.find_element(By.XPATH,' //*[@id="auth-error-message-box"]/div/h4')
+                    #         #Type Password
+                    #         otp_box = driver.find_element(By.XPATH,'//*[@id="ap_password"]')
+                    #         otp_box.send_keys(password)
+                    #         #click sign in
+                    #         siggi = driver.find_element(By.XPATH,'//*[@id="signInSubmit"]')
+                    #         siggi.click()
+                    #     except:
+                    #         pass
+                        
+                    # except:
+                    #     pass
+                    
+                    wait = WebDriverWait(driver, 120)
+                    wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
+                    myurl = driver.current_url
+                    if 'mfa' in myurl:
+                        enter_otp = True
+                    else:
+                        enter_otp = False
+                        
+                        
+                    if enter_otp:
+                        #check if already signed in or need to enter otp
+                    
                         try:
-                            wait = WebDriverWait(driver, 120)
-                            wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
-                            hackers_out = driver.find_element(By.XPATH,'//*[@id="auth-account-fixup-phone-form"]/div/h1')
-                            hackers_true = hackers_out.text
-                            if 'Keep hackers out' in hackers_true:
-                                not_now = driver.find_element(By.XPATH,'//*[@id="ap-account-fixup-phone-skip-link"]')
-                                not_now.click() 
+                            sign_in_check = driver.find_element(By.XPATH,'//*[@id="nav-cart-count-container"]/span[2]')
                         except:
-                            pass
+                            
+                            # Create a new TOTP object
+                            totp = pyotp.TOTP(secret)
+
+                            # Generate a new OTP
+                            otp = totp.now()
+                            
+                            #paste otp and click sign in
+                            otp_box = driver.find_element(By.XPATH,'//*[@id="auth-mfa-otpcode"]')
+                            otp_box.send_keys(otp)
+                        
+                            #checkbox for remember me
+                            ch_otp = driver.find_element(By.XPATH,'//*[@id="auth-mfa-remember-device"]')
+                            ch_otp.click()
+                            
+                            #click sign in for otp
+                            sign_in_otp = driver.find_element(By.XPATH,'//*[@id="auth-signin-button"]')
+                            sign_in_otp.click()
+                            
+                            time.sleep(3)
+                            
+                            # Case if the OTP is incorrect
+                            try:
+                                sign_in_otp = driver.find_element(By.XPATH,'//*[@id="auth-signin-button"]')
+                                passed=False
+                                while not passed:
+                                           
+                                    try:
+                                        driver.find_element(By.XPATH,'//*[@id="nav-link-accountList"]')
+                                        passed=True
+                                        break
+                                    except:
+                                        pass
+                            except:
+                                pass
+                            
+                                
+                            while True:
+                                cururl = driver.current_url
+                                if "https://www.amazon.com/?ref_=nav_ya_signin" in cururl:
+                                    skip_hackers = False
+                                    break
+                                    
+                                elif "accountfixup" in cururl:
+                                    skip_hackers = True
+                                    break
+                                
+                                elif "request" in cururl:
+                                    skip_hackers = False
+                                    break
+    
+                            if skip_hackers:
+                                while True:
+                                    #skip hackers-out check
+                                    try:
+                                        wait = WebDriverWait(driver, 200)
+                                        wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
+                                        hackers_out = driver.find_element(By.XPATH,'//*[@id="auth-account-fixup-phone-form"]/div/h1')
+                                        hackers_true = hackers_out.text
+                                        if 'Keep hackers out' in hackers_true:
+                                            not_now = driver.find_element(By.XPATH,'//*[@id="ap-account-fixup-phone-skip-link"]')
+                                            not_now.click() 
+                                            
+                                        break
+                                    except:
+                                        time.sleep(1)
+                                        print('Skipping Hackers Out')
+                    
+                    counter=0
+                    while True:
+                        try:
+                            driver.find_element(By.XPATH,'//*[@id="twotabsearchtextbox"]')
+                            print('Passed, Website Loaded Successfully')
+                            break
+                            # //*[@id="twotabsearchtextbox"]
+                            # /html/body/div/div[1]/div[3]/div/div/form/div[1]/div/div/div[2]/div/div[2]/a
+                    
+                        except UnboundLocalError:
+                            print('AdsPower Failed to launch,\nPlease make sure it opens correctly\nand Try again')
+                            break
+                            
+                        except:
+                            counter+=1
+                            time.sleep(5)
+                            print(f'Waiting to Pass {counter}/60, Will abort on 60')
+                            
+                            if counter==60:
+                                ex=1
+                                break
+                            
+                            try:
+                                driver.current_url
+                            except:
+                                break
+                                                
+
                 else:
                     otp_button = driver.find_element(By.XPATH,'//*[@id="continue"]')
                     otp_button.click()
@@ -320,6 +409,33 @@ class MainCode():
         else:
             pass
 
+
+        counter=0
+        while True:
+            try:
+                driver.find_element(By.XPATH,'//*[@id="twotabsearchtextbox"]')
+                print('Passed, Website Loaded Successfully')
+                break
+                # //*[@id="twotabsearchtextbox"]
+                # /html/body/div/div[1]/div[3]/div/div/form/div[1]/div/div/div[2]/div/div[2]/a
+        
+            except UnboundLocalError:
+                print('AdsPower Failed to launch,\nPlease make sure it opens correctly\nand Try again')
+                break
+                
+            except:
+                counter+=1
+                time.sleep(5)
+                print(f'Waiting to Pass {counter}/60, Will abort on 60')
+                if counter==60:
+                    ex=1
+                    break
+                
+                try:
+                    driver.current_url
+                except:
+                    break
+                
 
         # Open a new tab
         driver.execute_script("window.open('');")
@@ -339,8 +455,9 @@ class MainCode():
                 sign_in_merch.click()
                 break
             except:
-                pass
-            
+                time.sleep(1)
+                
+                              
         try:
             #case password again
 
@@ -356,29 +473,8 @@ class MainCode():
             
             
         except:
-            pass
-
-        try:
-            #case two step verification
-            two_step = driver.find_element(By.XPATH,'//*[@id="auth-mfa-form"]/div/div/h1')
-            case_two_step = two_step.text
-            if 'Two-Step Verification'in case_two_step:
-                
-                totp = pyotp.TOTP(secret)
-                otp = totp.now()
-                            
-                #paste otp and click sign in
-                otp_box = driver.find_element(By.XPATH,'//*[@id="auth-mfa-otpcode"]')
-                otp_box.send_keys(otp)
-                            
-                #click sign in for otp
-                sign_in_otp = driver.find_element(By.XPATH,'//*[@id="auth-signin-button"]')
-                sign_in_otp.click()
-            
-        except:
-            pass
-
-
+            time.sleep(1)
+        
         while True:
             url = driver.current_url
             if url in ['https://merch.amazon.com/sign-up/request/submitted','https://merch.amazon.com/sign-up/request','https://merch.amazon.com/terms','https://merch.amazon.com/sign-up/request/information-needed']:
@@ -513,30 +609,106 @@ class MainCode():
                     pass
         else:
             pass
-            
-
-        #Case it asked again for OTP
-        try:
-            #case two step verification
-            two_step = driver.find_element(By.XPATH,'//*[@id="auth-mfa-form"]/div/div/h1')
-            case_two_step = two_step.text
-            if 'Two-Step Verification'in case_two_step:
+        
+        while True:
+            urln = driver.current_url
+            if urln in ['https://account-merch.amazon.com/']:
                 
+                case_otp = False
+                break
+            elif 'new-otp' in urln:
+                
+                try:
+                    two_step = driver.find_element(By.XPATH,'//*[@id="authportal-main-section"]/div[2]/div/div/div/div/h1')
+                    case_otp = True
+                    break
+                except:
+                    time.sleep(2)
+                    print('Facing some delay or problem')
+                    
+            elif 'signin' in urln:
+                while True:
+                    try:
+                        
+                        #Enter Password
+                        passw = driver.find_element(By.XPATH,'//*[@id="ap_password"]')
+                        passw.send_keys(otp)
+                        time.sleep(1)
+                        #Enter Sign IN
+                        sign_in_otp_1 = driver.find_element(By.XPATH,'//*[@id="signInSubmit"]')
+                        sign_in_otp_1.click()
+                        while True:
+                            urls = driver.current_url
+                            if 'new-otp' in urls:
+                                case_otp=True
+                                break
+                            elif 'https://account-merch.amazon.com/' in urls:
+                                case_otp = False
+                                break
+                        break
+                    except:
+                        time.sleep(2)
+                        print('Facing some delay or problem')
+            elif 'mfa' in urln:
+                 
+                # Create a new TOTP object
                 totp = pyotp.TOTP(secret)
-                otp = totp.now()
-                            
-                #paste otp and click sign in
-                otp_box = driver.find_element(By.XPATH,'//*[@id="auth-mfa-otpcode"]')
-                otp_box.send_keys(otp)
-                            
-                #click sign in for otp
-                sign_in_otp = driver.find_element(By.XPATH,'//*[@id="auth-signin-button"]')
-                sign_in_otp.click()
-            
-        except:
-            pass
 
-        #Author/Publisher information
+                # Generate a new OTP
+                otp = totp.now()
+                
+                #Enter OTP
+                passw = driver.find_element(By.XPATH,'//*[@id="auth-mfa-otpcode"]')
+                passw.send_keys(otp)
+                time.sleep(1)
+                #Enter Sign IN
+                sign_in_otp_1 = driver.find_element(By.XPATH,'//*[@id="auth-signin-button"]')
+                sign_in_otp_1.click()
+                break
+            
+        if case_otp:
+            while True:
+                try:
+                    time.sleep(1)
+                    #case two step verification
+                    two_step = driver.find_element(By.XPATH,'//*[@id="authportal-main-section"]/div[2]/div/div/div/div/h1')
+                    case_two_step = two_step.text
+                    if 'Two-Step Verification'in case_two_step:
+                        #Check Send OTP on APP
+                        try:
+                            sign_in_otp_1 = driver.find_element(By.XPATH,'//*[@id="auth-select-device-form"]/div[1]/fieldset/div/label/span')
+                            sign_in_otp_1.click()
+                        except: 
+                            sign_in_otp_2 = driver.find_element(By.XPATH,'//*[@id="auth-select-device-form"]/div[1]/fieldset/div[1]/label/span')
+                            sign_in_otp_2.click()
+                            
+                        time.sleep(5)
+                        #Case Send OTP Button
+                        try:
+                            #Click Send OTP
+                            sign_in_otp = driver.find_element(By.XPATH,'//*[@id="auth-send-code"]')
+                            sign_in_otp.click()
+                            
+                            totp = pyotp.TOTP(secret)
+                            otp = totp.now()
+                                        
+                            #paste otp and click sign in
+                            otp_box = driver.find_element(By.XPATH,'//*[@id="auth-mfa-otpcode"]')
+                            otp_box.send_keys(otp)
+                                        
+                            #click sign in for otp
+                            sign_in_otp = driver.find_element(By.XPATH,'//*[@id="auth-signin-button"]')
+                            sign_in_otp.click()
+                        except:
+                            pass
+                        
+                        break
+                    
+                except:
+                    time.sleep(1)
+
+
+        #Author/Publisher information #
 
         wait = WebDriverWait(driver, 120)
         wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
@@ -616,7 +788,7 @@ class MainCode():
                         save_and_cont=True
                         break
                     except:
-                        pass
+                        time.sleep(1)
                 
                 wait = WebDriverWait(driver, 120)
                 wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
@@ -633,7 +805,7 @@ class MainCode():
                         we_are_in_last_page=True
                         break
                     except:
-                        pass
+                        time.sleep(1)
 
                 
                 time.sleep(2)
@@ -711,7 +883,7 @@ class MainCode():
                     #type country or region
                     
                     b2_box = driver.find_element(By.XPATH,'//*[@id="mat-input-3"]')
-                    b2_box.send_keys(d[4].capitalize())
+                    b2_box.send_keys(d[4].title())
                     time.sleep(1)
                     click_country = driver.find_element(By.CLASS_NAME,'mat-option-text')
                     click_country.click()
@@ -719,6 +891,7 @@ class MainCode():
                     break
                 except Exception as e:
                     print(e)
+                    time.sleep(1)
                     break
                 
             #type Address Line 1
@@ -784,8 +957,23 @@ class MainCode():
             use_But = driver.find_element(By.XPATH,'//*[@id="mat-dialog-0"]/app-workflow-dialog/app-smooth-height/div/div/div/app-create-edit-address-form/form/mat-dialog-actions/button')
             use_But.click()
             time.sleep(2)
-                
+            n=0
+            check_address_xpath = '//*[@id="mat-radio-11"]/label/div[2]/app-html-string/span'
+            check_xpath = '//*[@id="mat-checkbox-2"]/label/span'
+            # ..
+            switch_original_address_case = False
+            try:
+                original = driver.find_element(By.XPATH,'//*[@id="mat-radio-8"]/label/div[2]/div[1]')
 
+                if 'Original Address' in original.text:
+                    original.click()
+                    check_xpath = '//*[@id="mat-checkbox-1"]/label/span'
+                    check_address_xpath = '//*[@id="mat-radio-17"]/label/div[2]/app-html-string/span'
+                    switch_original_address_case = True
+                    
+            except:
+                pass
+            
             while True:
                 try:
                     driver.find_element(By.XPATH,'//*[@id="interview-bank-country"]')
@@ -793,7 +981,7 @@ class MainCode():
                 except:
                     time.sleep(1)
                     try:
-                        use_But = driver.find_element(By.XPATH,'//*[@id="mat-checkbox-2"]/label/span')
+                        use_But = driver.find_element(By.XPATH,check_xpath)
                         use_But.click()
                         time.sleep(1)
                         use_But = driver.find_element(By.XPATH,'//*[@id="mat-dialog-1"]/app-workflow-dialog/app-smooth-height/div/div/div/app-suggestions/form/mat-dialog-actions/button[1]')
@@ -802,6 +990,7 @@ class MainCode():
                     except:
                         time.sleep(3)
                         print('Wrong Data please review to continue')
+                        driver.set_window_size(900,700)
                 
                     
             #Add Bank Details
@@ -847,15 +1036,15 @@ class MainCode():
             # //*[@id="super-comp-10"]/div/div[3]/div[1]/button
             # //*[@id="mat-radio-11"]/label/div[2]/app-html-string/span
             # //*[@id="mat-dialog-1"]/app-workflow-dialog/app-smooth-height/div/div/div/app-custom-address-sources/form/mat-dialog-actions/button[1]
-            b013_box = driver.find_element(By.XPATH,'//*[@id="mat-radio-11"]/label/div[2]/app-html-string/span')
+            b013_box = driver.find_element(By.XPATH,check_address_xpath)
             b013_box.click()
             time.sleep(1)
-            n=0
+            
             accurate_will_show=False
-            while True:
-                n+=1
+            while True:  
+                n+=1 
                 xpath = f'//*[@id="mat-dialog-{n}"]/app-workflow-dialog/app-smooth-height/div/div/div/app-custom-address-sources/form/mat-dialog-actions/button[1]'
-                try:
+                try: 
 
                     b26_box = driver.find_element(By.XPATH,xpath)
                     b26_box.click()
@@ -864,28 +1053,56 @@ class MainCode():
                     break
                 except Exception as e:
                     time.sleep(1)
-                    print('pressing use this current address')
-                    print(e)
+                    print('Pressing use this current address')
+                    driver.set_window_size(900,700) 
                     
 
             time.sleep(1)
-            #Case address not accurate
+            #Case address not accurate 
             if accurate_will_show:
                 while True:
-                    try:
-                        b013_box = driver.find_element(By.XPATH,'//*[@id="mat-checkbox-4"]/label/span')
-                        b013_box.click()
-                        time.sleep(1)
-                        while True:
-                            try:
-                                b013_box = driver.find_element(By.XPATH,'//*[@id="mat-dialog-3"]/app-workflow-dialog/app-smooth-height/div/div/div/app-suggestions/form/mat-dialog-actions/button[1]')
-                                b013_box.click()
-                                break
-                            except:
-                                time.sleep(1)
-                        break
-                    except:
-                        time.sleep(1)
+                    if switch_original_address_case:
+                        try:
+                            #Check Original Address
+                            original = driver.find_element(By.XPATH,'//*[@id="mat-radio-22"]/label/div[2]/div[1]')
+                            original.click()
+                            time.sleep(1)
+                            check_xpath = '//*[@id="mat-checkbox-2"]/label/span'
+                            #Select the confirm check box
+                            use_But = driver.find_element(By.XPATH,check_xpath)
+                            use_But.click()
+                            # CLick the use address button
+                            time.sleep(1)
+                            use_But = driver.find_element(By.XPATH,'//*[@id="mat-dialog-3"]/app-workflow-dialog/app-smooth-height/div/div/div/app-suggestions/form/mat-dialog-actions/button[1]')
+                            use_But.click()
+                            print('Address Confirmed')
+                            break
+                        except:
+                            time.sleep(1)
+                            print('I Can"t Press')
+                    else:
+                        try: 
+                            while True:
+                                try:
+                                    b013_box = driver.find_element(By.XPATH,'//*[@id="mat-checkbox-4"]/label/span')
+                                    b013_box.click()
+                                    time.sleep(1) 
+                                    break
+                                except:
+                                    time.sleep(1)
+                                    print('Checking Box')
+                            while True:
+                                try:
+                                    b013_box = driver.find_element(By.XPATH,'//*[@id="mat-dialog-3"]/app-workflow-dialog/app-smooth-height/div/div/div/app-suggestions/form/mat-dialog-actions/button[1]')
+                                    b013_box.click()
+                                    break
+                                except:
+                                    time.sleep(1)
+                                    print('Clicking Use Address')
+                                    
+                            break
+                        except:
+                            time.sleep(1)
         
         
             #Type BIC Code
@@ -922,7 +1139,7 @@ class MainCode():
                     tax_button_invisible=False
                     break
                 except:
-                    pass
+                    time.sleep(1)
 
             try:
                 time.sleep(3)
@@ -945,19 +1162,21 @@ class MainCode():
                 started_nonus = True
                 break
             except:
-                pass
+                time.sleep(1)
             
 
         #Click agent no
         agent_but = driver.find_element(By.XPATH,'//*[@id="toggleButtonId_IsIntermediaryAgent_false"]/span/input')
         agent_but.click()
 
+
         #choose country
         c = driver.find_element(By.XPATH,'//*[@id="a-autoid-12-announce"]')
         c.click()
         dropdown = driver.find_element(By.CLASS_NAME,'a-popover-inner')
-        country = dropdown.find_element(By.LINK_TEXT,d[4].capitalize())
+        country = dropdown.find_element(By.LINK_TEXT,d[4].title())
         country.click()
+        
 
         time.sleep(1)
         #uncheck I have TIN number
@@ -980,7 +1199,7 @@ class MainCode():
         time.sleep(1)
         cont = driver.find_element(By.XPATH,'//*[@id="a-autoid-86-announce"]')
         cont.click()
-        
+        counter2=0
         while True:
             try:
                 check_sign = driver.find_element(By.XPATH,'//*[@id="checkBoxDiv_SignatureCapacityForIndividualW8Ben"]/span/div/label/i')
@@ -995,7 +1214,14 @@ class MainCode():
                     break
                 except:
                     time.sleep(2)
-                    print('Waiting Page')        
+                    print('Waiting Page')       
+                    counter2+=1
+                    print(f'Trial {counter2}/60 , will abort on 60')
+                    if counter2==60:
+                        ex=1
+                        break
+        if ex==1:
+            raise SystemExit('Stopped due to an intrruption') 
         
         if not valid_address_passed:
             try:
@@ -1027,7 +1253,7 @@ class MainCode():
                 signature_name.send_keys(d[5])
                 break
             except:
-                pass
+                time.sleep(1)
 
 
 
@@ -1102,7 +1328,7 @@ class MainCode():
                 break
                 
             except:
-                pass
+                time.sleep(1)
 
 
         save_and_cont = False
@@ -1119,7 +1345,7 @@ class MainCode():
                 save_and_cont=True
                 break
             except:
-                pass
+                time.sleep(1)
 
         we_are_in_last_page=False
         while not we_are_in_last_page:
@@ -1134,7 +1360,7 @@ class MainCode():
                 we_are_in_last_page=True
                 break
             except:
-                pass
+                time.sleep(1)
 
         #Type org name and additional information
         org_name = driver.find_element(By.XPATH,'//*[@id="orgName-field"]')
@@ -1143,7 +1369,11 @@ class MainCode():
         paragraph = driver.find_element(By.XPATH,'//*[@id="additionalInfo-field"]')
         paragraph.send_keys(d[17])
 
-        print(True, '\nMerch Account Created Successfully')
+        print(True, '\nMerch Account Created Successfully, Regards/ Dev Gad Badr')
+        try:
+            self.logTheResult(idd=idd)
+        except:
+            print("Can't be logged, something bad happened")
 
 
         '''''
