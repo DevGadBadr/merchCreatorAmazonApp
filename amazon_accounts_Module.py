@@ -396,6 +396,12 @@ class MainCode(QObject):
                                 break
                             
                             try:
+                                driver.find_element(By.XPATH,'//*[@id="navbar-backup-backup"]/div/div[3]/a[1]')
+                                driver.refresh()
+                            except:
+                                pass
+                            
+                            try:
                                 driver.current_url
                             except:
                                 break
@@ -883,7 +889,7 @@ class MainCode(QObject):
                     #type country or region
                     
                     b2_box = driver.find_element(By.XPATH,'//*[@id="mat-input-3"]')
-                    b2_box.send_keys(d[4].title())
+                    b2_box.send_keys(d[4].title().replace('And','and'))
                     time.sleep(1)
                     click_country = driver.find_element(By.CLASS_NAME,'mat-option-text')
                     click_country.click()
@@ -1174,7 +1180,18 @@ class MainCode(QObject):
         c = driver.find_element(By.XPATH,'//*[@id="a-autoid-12-announce"]')
         c.click()
         dropdown = driver.find_element(By.CLASS_NAME,'a-popover-inner')
-        country = dropdown.find_element(By.LINK_TEXT,d[4].title())
+        print( d[4].title().replace('And','and'))
+        print( d[4].title().replace('And','-').replace(' ',''))
+        
+        try:
+            country = dropdown.find_element(By.LINK_TEXT,d[4].title().replace('And','and'))
+        except:
+            try:
+                country = dropdown.find_element(By.LINK_TEXT,d[4].title().replace('And','-').replace(' ',''))
+            except:
+                
+                country = dropdown.find_element(By.LINK_TEXT,d[4].title())
+                
         country.click()
         
 
