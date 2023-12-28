@@ -1,0 +1,7 @@
+# Ignore build artifacts
+build\
+dist\
+amazonApp.spec
+main.spec
+
+
