@@ -84,7 +84,10 @@ class MainCode(QObject):
         chrome_driver = resp["data"]["webdriver"]
         chrome_options = Options()
         chrome_options.add_experimental_option("debuggerAddress", resp["data"]["ws"]["selenium"])
+        # proxy = '192.168.185.33:30001'
+        # chrome_options.add_argument('--proxy-server=%s' % proxy)
         driver = webdriver.Chrome(service=myservice, options=chrome_options)
+        
 
         msg = 'Code Running...'
         print(msg)
@@ -342,36 +345,39 @@ class MainCode(QObject):
                                 pass
                             
                                 
-                            while True:
-                                cururl = driver.current_url
-                                if "https://www.amazon.com/?ref_=nav_ya_signin" in cururl:
-                                    skip_hackers = False
-                                    break
+                    while True:
+                        cururl = driver.current_url
+                        if "https://www.amazon.com/?ref_=nav_ya_signin" in cururl:
+                            skip_hackers = False
+                            break
+                            
+                        elif "accountfixup" in cururl:
+                            skip_hackers = True
+                            break
+                        
+                        elif "request" in cururl:
+                            skip_hackers = False
+                            break
+                        elif 'https://www.amazon.com/?language=en_US&currency=USD&ref_=nav_ya_signin' in cururl:
+                            skip_hackers = False
+                            break
+
+                    if skip_hackers:
+                        while True:
+                            #skip hackers-out check
+                            try:
+                                wait = WebDriverWait(driver, 200)
+                                wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
+                                hackers_out = driver.find_element(By.XPATH,'//*[@id="auth-account-fixup-phone-form"]/div/h1')
+                                hackers_true = hackers_out.text
+                                if 'Keep hackers out' in hackers_true:
+                                    not_now = driver.find_element(By.XPATH,'//*[@id="ap-account-fixup-phone-skip-link"]')
+                                    not_now.click() 
                                     
-                                elif "accountfixup" in cururl:
-                                    skip_hackers = True
-                                    break
-                                
-                                elif "request" in cururl:
-                                    skip_hackers = False
-                                    break
-    
-                            if skip_hackers:
-                                while True:
-                                    #skip hackers-out check
-                                    try:
-                                        wait = WebDriverWait(driver, 200)
-                                        wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
-                                        hackers_out = driver.find_element(By.XPATH,'//*[@id="auth-account-fixup-phone-form"]/div/h1')
-                                        hackers_true = hackers_out.text
-                                        if 'Keep hackers out' in hackers_true:
-                                            not_now = driver.find_element(By.XPATH,'//*[@id="ap-account-fixup-phone-skip-link"]')
-                                            not_now.click() 
-                                            
-                                        break
-                                    except:
-                                        time.sleep(1)
-                                        print('Skipping Hackers Out')
+                                break
+                            except:
+                                time.sleep(1)
+                                print('Skipping Hackers Out')
                     
                     counter=0
                     while True:
@@ -695,6 +701,8 @@ class MainCode(QObject):
                             sign_in_otp = driver.find_element(By.XPATH,'//*[@id="auth-send-code"]')
                             sign_in_otp.click()
                             
+                            time.sleep(2)
+                            
                             totp = pyotp.TOTP(secret)
                             otp = totp.now()
                                         
@@ -705,11 +713,41 @@ class MainCode(QObject):
                             #click sign in for otp
                             sign_in_otp = driver.find_element(By.XPATH,'//*[@id="auth-signin-button"]')
                             sign_in_otp.click()
+                            
                         except:
                             pass
                         
+                        # Case There was a problem message
+                        errormsg = False
+                        while True:
+                            try:
+                                ele = driver.find_element(By.XPATH,'//*[@id="auth-error-message-box"]/div/h4')
+                                msge = ele.text
+                                if 'There was a problem' in msge:
+                                    errormsg = True
+                                
+                                if errormsg:
+                                    time.sleep(2)
+                            
+                                    totp = pyotp.TOTP(secret)
+                                    otp = totp.now()
+                                                
+                                    #paste otp and click sign in
+                                    otp_box = driver.find_element(By.XPATH,'//*[@id="auth-mfa-otpcode"]')
+                                    otp_box.send_keys(otp)
+                                                
+                                    #click sign in for otp
+                                    sign_in_otp = driver.find_element(By.XPATH,'//*[@id="auth-signin-button"]')
+                                    sign_in_otp.click()
+                                    break
+                                
+                                else:
+                                    break
+           
+                            except:
+                                time.sleep(1)
+                                break
                         break
-                    
                 except:
                     time.sleep(1)
 
@@ -901,21 +939,16 @@ class MainCode(QObject):
                     break
                 
             #type Address Line 1
-            
             b4_box = driver.find_element(By.XPATH,'//*[@id="mat-input-4"]')
             b4_box.send_keys(d[6])
             
             #type Address Line 2
-            
             b5_box = driver.find_element(By.XPATH,'//*[@id="mat-input-5"]')
             b5_box.send_keys(d[7])
-            
-            
+                        
             #type city
-            
             b6_box = driver.find_element(By.XPATH,'//*[@id="mat-input-6"]')
             b6_box.send_keys(d[8])
-
 
             #type state/province/region
             b7_box = driver.find_element(By.XPATH,'//*[@id="mat-input-7"]')
@@ -958,8 +991,7 @@ class MainCode(QObject):
             b8_box = driver.find_element(By.XPATH,'//*[@id="mat-input-8"]')
             b8_box.send_keys(d[10])
             
-            # Press Use this address
-            
+            # Press Use this address     
             use_But = driver.find_element(By.XPATH,'//*[@id="mat-dialog-0"]/app-workflow-dialog/app-smooth-height/div/div/div/app-create-edit-address-form/form/mat-dialog-actions/button')
             use_But.click()
             time.sleep(2)
